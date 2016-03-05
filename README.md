@@ -33,14 +33,31 @@ CS35L Winter 2016 - Taught by Ruolin Fan as TA for Section 5
     - Branch
     - Tags
 
-**Week 5:** __
+**Week 5:** _Debugging in C_
+  - Debugging with gdb (jesus christ this is disgusting)
 
-**Week 6:** __
+**Week 6:** _Setting up an SSH server_
+  - Private vs Public keys
+  - Possible spoofing tactics and bypasses
+  - SSH agent
 
-**Week 7:** __
+**Week 7:** _System calls_
+  - read/write vs putchar/getchar
+  - buffers
+  - Kernel mode vs user mode
+  - Why are system calls slow?
 
-**Week 8:** __
+**Week 8:** _Multithreading and processing_
+  - Multithreading
+    - Cores
+    - p_threads
+    - Mutex/atomic operations
+    - Deadlock problems
+  - Multiprocessing
 
-**Week 9:** __
+**Week 9:** _Dynamic Linking vs Static Linking_
+  - Speed differences between them
+  - GCC flags
+  - attribute((constructor)) and attribute((constructor))
 
 **Week 10:** _Presentations_
