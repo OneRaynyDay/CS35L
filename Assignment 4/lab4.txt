@@ -1,0 +1,224 @@
+Step 1: Download diffutils using git:
+
+$ git clone git://git.savannah.gnu.org/diffutils.git
+
+Cloning into 'diffutils'...
+remote: Counting objects: 4599, done.
+remote: Compressing objects: 100% (1266/1266), done.
+remote: Total 4599 (delta 3277), reused 4599 (delta 3277)
+Receiving objects: 100% (4599/4599), 1.31 MiB | 661.00 KiB/s, done.
+Resolving deltas: 100% (3277/3277), done.
+
+Now it is successfully downloaded into my Week\ 4 folder.
+
+Step 2: cd into diffutils and see the log
+$ git log
+
+We see the nearest commit was by Jim Meyering on Fri Jan 11
+
+$ git log > git-log.txt
+
+Now the log is stored in git-log.txt
+
+Step 3: try $ git tag
+We see the version numbers. 
+
+$ git tag > git-tag.txt
+
+Now the tags are stored in git-tag.txt
+
+Step 4: $ git log --grep "maint: quote"
+Returns every single instance of logs that contains "maint: quote". 
+There was only 1 entry.
+
+commit 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f
+Author: Paul Eggert <eggert@cs.ucla.edu>
+Date:   Wed Jan 25 23:46:16 2012 -0800
+
+    maint: quote 'like this' or "like this", not `like this'
+    
+    This is in response to a recent change in the GNU coding standards,
+    which now suggest quoting 'like this' or "like this", instead of
+    `like this' or ``like this''.
+    * HACKING, NEWS, README, README-hacking, TODO, doc/diagmeet.note:
+    * doc/diffutils.texi, ms/config.bat, ms/config.site:
+    * src/analyze.c, src/cmp.c, src/context.c, src/diff.c:
+    * src/diff.h, src/diff3.c, src/dir.c, src/ifdef.c, src/io.c:
+    * src/sdiff.c, src/side.c, src/system.h, src/util.c:
+    * tests/help-version:
+    Quote 'like this' or "like this" in commentary.
+    * cfg.mk (old_NEWS_hash): Adjust to reflect new NEWS quoting.
+    * man/help2man: Update to 1.40.4 version, with quoting fixed as above.
+    * po/en.po: Remove translation involving `, as it's no longer needed.
+    * src/cmp.c (try_help, specify_ignore_initial, usage, main):
+    * src/diff.c (main, try_help, option_help_msgid, specify_value)
+    (compare_files):
+    * src/diff3.c (main, try_help, option_help_msgid, usage)
+    (read_diff):
+    * src/dir.c (compare_names):
+    * src/sdiff.c (try_help, usage, check_child_status, main):
+    * src/util.c (finish_output):
+    * tests/help-version:
+    Quote 'like this' in output.
+
+Step 5: 
+$ git format-patch -1 --stdout 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f > 
+quote-patch.txt
+
+By using the previous SHA1 hash from the commit message, I called format-patch,
+option -1 for only that patch, --stdout to print to stdout and then pipe into 
+quote-patch.txt
+
+Step 6:
+Now I change my version number to v3.0, as found inside of git-tag.txt
+$ git checkout "v3.0"
+and now my head is at "022cd5c... version 3.0"
+About 8 hunks failed in total during the patch.
+
+Step 7:
+Now I apply the patch.
+$ patch -p1 < patch.txt
+the -p1 option strips the backslashes for 1 layer inside the quote-patch.txt
+
+Step 8:
+By calling
+$ git status
+I was able to get some output like the ones below:
+HEAD detached at v3.0
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   NEWS
+        modified:   README
+        modified:   TODO
+        modified:   doc/diagmeet.note
+        modified:   ms/config.bat
+        modified:   ms/config.site
+        modified:   po/en.po
+        modified:   src/analyze.c
+        modified:   src/cmp.c
+        modified:   src/context.c
+        modified:   src/diff.c
+        modified:   src/diff.h
+        modified:   src/diff3.c
+        modified:   src/dir.c
+        modified:   src/ifdef.c
+        modified:   src/io.c
+        modified:   src/sdiff.c
+        modified:   src/side.c
+        modified:   src/system.h
+        modified:   src/util.c
+        modified:   tests/help-version    
+...
+
+This means I didn't add the changes to my HEAD, which were the files
+that were patched previously.
+
+Step 9:
+To revert back the patch, I entered emacs from all the modified files
+and used the C-x v u command to revert everything that doesn't have a 
+file extension of .c
+
+To revert back .c files, I entered the file and did C-x v =. The buffer 
+for diff opens and @ every part where there's a comment with a diff,
+I revert the hunk(I don't for the parts where code is involved). To do this
+I used C-c C-a and reverted the hunks one by one.
+
+Step 10:
+Then, I had to change back the .c's by opening both /src/diff.c and 
+/src/diff.c.rej
+at the same time, and /src/diff3.c and /src/diff3.c.rej at the same time and
+go to the lines where the diffs reside and change the `s into 's.
+
+There's about 3-4 diffs in diff.c and 1 diff in diff3.c
+
+Step 11:
+Now that we have the files:
+#NEWS#
+HACKING.rej
+NEWS.orig
+README-hacking.orig
+README-hacking.rej
+README.orig
+README.rej
+cfg.mk.orig
+cfg.mk.rej
+doc/#diagmeet.note#
+git-log.txt
+git-tag.txt
+ms/config.site.orig
+quote-patch.txt
+src/cmp.c.orig
+src/context.c.orig
+src/diff.c.orig
+src/diff.c.rej
+src/diff.h.orig
+src/diff3.c.orig
+src/diff3.c.rej
+src/dir.c.orig
+src/sdiff.c.orig
+src/system.h.orig
+src/util.c.orig
+tests/help-version.orig
+
+from the $ git status
+we found untracked files in that list.
+We have to manually remove them. First let's move our homework files into 
+another folder.
+Afterwards, we remove everything via rm insertFileHere.extension. For #NEWS#, it
+was an emacs autosave file, which can be removed via
+$ rm "#NEWS"
+
+Step 12:
+We write the git diff into a file called quote-3.0-patch.txt.
+$ git diff > quote-3.0-patch.txt
+
+when we use 
+$ cat quote-3.0-patch.txt | wc  
+we get:
+  332    1795   12536
+which is reasonable from the specs
+
+Step 13:
+The steps to do this are in the README-hacking
+there it says:
+    $ ./bootstrap
+
+And there you are!  Just
+
+    $ ./configure
+    $ make
+    $ make check
+
+At this point, there should be no difference between your local copy,
+and the master:
+
+    $ cvs diff -pu
+
+should output no difference.
+
+After calling ./bootstrap, we then call ./configure, then call make/make check
+
+We can check to see if our diff was changed.
+$ cat quote-3.0-patch.txt | diff . -
+diff: cannot compare '-' to a directory
+The diff error now says '-' instead of `-'. This is good.
+
+Step 14:
+I copied the folders with
+$ cp -r diffutils diffutils-3.0
+$ cp -r diffutils diffutils-3.0-patch
+afterwards, I changed the diffutils-3.0's version number by doing
+$ git checkout v3.0
+inside of diffutils-3.0
+
+Step 15:
+By using the command: 
+$ diffutils-3.0-patch/src/diff -pru diffutils-3.0 diffutils-3.0-patch > 
+quote-3.0-test.txt
+
+Afterwards, I checked the quote-3.0-test.txt
+There are some differences, and some are in the strings themselves for the code,
+therefore they are not innocuous.
+

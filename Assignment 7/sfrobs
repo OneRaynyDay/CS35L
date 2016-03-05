@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# to hold the answer
+
+values=""
+ins=$(printf "%o\n" {0..255})
+keys=$(printf "\\%s" {0..3}{0..7}{0..7})
+for i in {0..255}; do
+    values="$values$(printf $printf "\\%03o" $((i ^ 42)))"; 
+ans=$(printf "%o\n" {0..255})
+done
+#echo $keys
+#echo $values
+cat | tr "$keys" "$values" | sort | tr "$values" "$keys"
+

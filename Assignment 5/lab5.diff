@@ -1,0 +1,29 @@
+--- coreutils-with-bug/lib/timespec.h	2005-09-21 23:05:39.000000000 -0700
++++ newCoreutils/coreutils-with-bug/lib/timespec.h	2016-02-03 20:52:26.000000000 -0800
+@@ -18,7 +18,7 @@
+ 
+ #if ! defined TIMESPEC_H
+ # define TIMESPEC_H
+-
++# include <limits.h>
+ # include <sys/types.h>
+ # if TIME_WITH_SYS_TIME
+ #  include <sys/time.h>
+@@ -45,8 +45,16 @@
+ static inline int
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
+-  int diff = a.tv_sec - b.tv_sec;
++  long ldiff = a.tv_sec - b.tv_sec;
++  int diff = 0;
++  if(ldiff > INT_MAX)
++      diff = INT_MAX;
++  else if(ldiff < INT_MIN)
++      diff = INT_MIN;
++  else
++    diff = a.tv_sec - b.tv_sec;  
+   return diff ? diff : a.tv_nsec - b.tv_nsec;
++
+ }
+ 
+ # if ! HAVE_DECL_NANOSLEEP

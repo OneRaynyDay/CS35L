@@ -1,0 +1,124 @@
+#1.
+$ touch hw4.txt
+$ vim h4.txt
+enter this file
+
+#2.
+$ git checkout v3.0 
+$ git branch quote
+
+The first command allowed me to checkout v3.0, specified in the
+instructions.
+
+The second command allowed me to create a branch called quote @ v3.0
+
+#3.
+I took the quote-3.0-patch.txt, and patched the diffutils folder
+by using the following:
+
+$ patch -p1 < quote-3.0-patch.txt
+patching file src/cmp.c
+patching file src/diff.c
+patching file src/diff3.c
+patching file src/dir.c
+patching file src/sdiff.c
+patching file src/util.c
+
+#4 & 5.
+To use the add-change-log-entry-other-window function, I used
+$ emacs
+C-x 4 a
+
+I wrote in this for my ChangeLog:
+        * src/cmp.c: Changed the quotation marks to standard.
+        * src/diff.c: Changed the quotation marks to standard
+                        (also in string literal).
+        * src/diff3.c: Changed the quotation marks to standard
+                        (also in string literal).
+        * src/dir.c: Changed the quotation marks to standard.
+        * src/sdiff.c: Changed the quotation marks to standard.
+        * src/util.c: Changed the qutoation marks to standard.
+
+#6.
+I then added all the changes of these files by doing 
+$ git add .
+which then added all the files to git.
+
+I then committed the changes by doing
+
+$ git commit -F ChangeLog
+so that when I checked 
+$ git log
+I could see this as the most recent submission:
+
+commit f25ffcd334ca9498896a12e9006b9eb1086f86d2
+Author: Ray Zhang <rayz@lnxsrv02.seas.ucla.edu>
+Date:   Fri Jan 29 20:41:40 2016 -0800
+
+    2016-01-29  Ray Zhang  <rayz@lnxsrv02.seas.ucla.edu>
+    
+        * src/cmp.c: Changed the quotation marks to standard.
+        * src/diff.c: Changed the quotation marks to standard
+                    (also in string literal).
+        ...
+
+#7
+By using the following,
+$ git format-patch -1 --stdout HEAD > formatted-patch.txt
+
+I made the formatted-patch.txt, which is about 700 lines long of patch.
+
+#8
+I sent my partner(Stephanie Lam, UID:204450286, Lab 3) my formatted-patch.txt. 
+I scp'd her file onto my linux server and proceeded to check out via git:
+$ git checkout v3.0
+$ git branch partner
+
+I checked back out into 3.0 and branched into partner.
+Then I 
+$ git am < formatted-patch.txt
+and it patched, saying: 
+Applying: 2016-01-29 Stephanie Yintung Lam <classlam@lnxsrv09.seas.ucla.edu>
+
+Now that the patch is formatted:
+$ ./bootstrap
+$ ./configure
+$ make
+$ make check
+
+Afterwards, I tried the following:
+$ cat formatted-patch.txt | src/diff . -
+src/diff: cannot compare '-' to a directory
+
+This is correct. Instead of `-', we see '-'. Her patch was successful.
+
+#9
+Now I checked out the ChangeLog within the directory that was created after the
+$ make distdir
+$ cd diffutils-3.0.1-4d37b
+Inside the changelog, the most recent log was:
+
+    2016-01-29  Stephanie Yintung Lam  <classlam@lnxsrv09.seas.ucla.edu>
+
+    2016-01-29 Stephanie Yintung Lam <classlam@lnxsrv09.seas.ucla.edu>
+        * cmp.c: changed ` to ' in string constants
+
+        * diff.c: changed ` to ' in string constants
+
+        * diff3.c: changed ` to ' in string constants
+
+        * dir.c: changed ` to ' in string constants
+
+        * sdiff.c: changed ` to ' in string constants
+
+        * util.c: changed ` to ' in string constants
+
+#10
+I downloaded X-11 from the link from piazza(The application name = XQuartz)
+and restarted my computer. I then ssh'd back into rayz@lnxsrv.seas.ucla.edu
+and then 
+$ cd emacs
+and then ran 
+$ gitk
+And the graphic interface popped up. The rest of #10 is in my
+gitk-screenshot.png and gitk-description.txt.

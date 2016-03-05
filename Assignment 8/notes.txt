@@ -1,0 +1,70 @@
+Multitasking:
+
+Run multiple processes to increase performance
+processes do not sure internal structures(stack, variable)
+    -communicate via IPC (inter-process communication) methods
+        -pipes sockets signals etc
+single core : illusion of parallelism
+    -they used single core to switch between processes (used an OS scheduler)
+    -people liked this because they could multi-task in like windows 95
+        -no 1 program takes all the time in the core
+multi core : true parallelism
+    -computer can actually run more than 1 process at the same time.
+
+Multitasking(processing) example:
+
+in shell, if you have:
+$ tr -s n a | sort -u | comm -23 - words
+Here 3 separate processes:
+    -P1 tr
+    -P2 sort
+    -P3 comm
+Common buffer pipes are used(stdin and stdout)
+
+Thread vs Process
+Process - executing instance of an application (a program)
+    - One program is a process (multiprocessing)
+    - switching between 1 process to another, is HEAVYWEIGHT and thus is slow
+Thread - path of execution within a PROCESS (thread is contained by a process)
+    - process can have MULTIPLE threads (multithreading)
+    - threads have their own function stacks, but can access global variables
+        - they can write to same data structures and variables
+    - switching between 1 thread to another, is LIGHTWEIGHT and thus is faster
+
+Threads:
+    - memory : private/shared
+    - each thread has its own:
+        -stack
+        -registers
+        -thread ID
+    - each thread share the following:
+        - code
+        - global data
+        - OS resources
+    - Communication through shared memory
+    - Fork join model:
+        - sequential code goes through parallel code which then converges back to
+            sequential code at the end of the task
+
+How to create threads (in powerpoint)
+#include <pthread.h>
+int pthread_create(pthread_t *thread, const pthread_attr_t * attr...);
+    returns 0 on success
+
+Race conditions:
+output depends on thread execution order
+    - Shared data changed by 2 threads
+        - int balance = 1000;
+    - Thread 1:
+        - T1 - read balance, deduct 50, update balance
+    - Thread 2:
+        - T2 - read balance, add 150, update balance
+    You could be adding/deducting at the same time and update balance
+
+Solution: 
+use a mutex - order:
+    thread 1: mutex.lock()
+              mutex.unlock()
+    thread 2: mutex.lock()
+              mutex.unlock()
+

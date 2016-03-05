@@ -1,0 +1,115 @@
+Step 1: I first ssh'd into my linux server: $ ssh rayz@lnxsrv.seas.ucla.edu
+
+I then downloaded the .tar.gz using:
+$ wget http://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+
+I then unzipped the .tar.gz using: $ tar –xzvf coreutils-7.6.tar.gz 
+
+I made a directory using $ mkdir ~/coreutilsInstall
+
+Step 2: I read inside of ~/coreutils-7.6 and used vim's / during normal mode:
+/--prefix
+
+I found that I need to use the following command to configure the file
+installation: $ ./configure --prefix ~/coreutilsInstall (This was after I cd'd
+into ~/coreutils-7.6)
+
+Step 3: I then compiled it using $ make
+
+and installed it using 
+
+$ make install
+
+Step 4: I cd'd into coreutilsInstall/bin to execute the scripts: 
+$ cd coreutilsInstall/bin
+
+and executed the command below:
+
+$ ./ls -la
+and received the following as the output(incomplete because too long)
+
+-rwxr-xr-x 1 rayz csugrad 127647 2016-01-19 11:48 [
+-rwxr-xr-x 1 rayz csugrad 119278 2016-01-19 11:48 base64
+-rwxr-xr-x 1 rayz csugrad  90221 2016-01-19 11:48 basename
+-rw-r--r-- 1 rayz csugrad   1034 2016-01-20 20:14 brady.patch
+-rwxr-xr-x 1 rayz csugrad 205955 2016-01-19 11:48 cat
+-rwxr-xr-x 1 rayz csugrad 250413 2016-01-19 11:48 chcon
+-rwxr-xr-x 1 rayz csugrad 229158 2016-01-19 11:48 chgrp
+-rwxr-xr-x 1 rayz csugrad 213270 2016-01-19 11:48 chmod
+...
+
+meanwhile, when executing the system's ls:
+
+$ ls -la
+
+drwxr-xr-x 2 rayz csugrad   8192 Jan 20 20:16 .
+drwxr-xr-x 5 rayz csugrad   4096 Jan 19 11:48 ..
+-rwxr-xr-x 1 rayz csugrad 127647 Jan 19 11:48 [
+-rwxr-xr-x 1 rayz csugrad 119278 Jan 19 11:48 base64
+-rwxr-xr-x 1 rayz csugrad  90221 Jan 19 11:48 basename
+-rw-r--r-- 1 rayz csugrad   1034 Jan 20 20:14 brady.patch
+-rwxr-xr-x 1 rayz csugrad 205955 Jan 19 11:48 cat
+-rwxr-xr-x 1 rayz csugrad 250413 Jan 19 11:48 chcon
+-rwxr-xr-x 1 rayz csugrad 229158 Jan 19 11:48 chgrp
+-rwxr-xr-x 1 rayz csugrad 213270 Jan 19 11:48 chmod
+
+we can see that the date is wrong for our locale in the ./ls
+
+Step 5: I then went onto the gnu website online:
+http://lists.gnu.org/archive/html/bug-coreutils/2009-09/msg00410.html
+And checked out their .diff file that they posted online.
+
+I put the .diff file into a file called ls.patch inside of 
+the directory ~/coreutils-7.6/src with the following:
+$ cd ~
+$ cd coreutils-7.6/src
+$ vim
+<inserted text> :w ls.patch :q
+
+Step 6: I executed the patch like following:
+$ patch < ls.patch 
+and got the output:
+Hunk #1 succeeded at 2013 (offset -1 lines).
+Hunk #2 succeeded at 2028 (offset -1 lines).
+
+Which meant that the .patch file was able to patch correctly.
+We then remake the src file by calling "make", executing the
+Makefile.
+
+$ make
+
+the result of the output is:
+make  all-am
+make[1]: Entering directory 
+'/w/home.07/cs/ugrad/rayz/coreutils-7.6/src'
+  CC     ls.o
+  CCLD   dir
+  CCLD   vdir
+  CCLD   ls
+make[1]: Leaving directory 
+'/w/home.07/cs/ugrad/rayz/coreutils-7.6/src'
+
+Step 7: I confirmed that the patch was successful by the
+following command:
+
+$ cd ~/coreutils-7.6/src
+$ ./ls -la
+
+and got the following as my output:
+
+drwxr-xr-x  3 rayz csugrad  28672 Jan 20 20:19 .
+drwxr-xr-x 13 rayz csugrad   8192 Jan 19 11:43 ..
+-rwxr-xr-x  1 rayz csugrad 127647 Jan 19 11:47 [
+-rwxr-xr-x  1 rayz csugrad 119278 Jan 19 11:48 base64
+-rw-r--r--  1 rayz csugrad   8422 Sep  1  2009 base64.c
+-rw-r--r--  1 rayz csugrad  37920 Jan 19 11:48 base64.o
+-rwxr-xr-x  1 rayz csugrad  90221 Jan 19 11:48 basename
+-rw-r--r--  1 rayz csugrad   3787 Sep  1  2009 basename.c
+-rw-r--r--  1 rayz csugrad  18744 Jan 19 11:48 basename.o
+...
+
+As we can see, the date time is now fixed to what it is
+supposed to be given the locale.
+
+
+

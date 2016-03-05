@@ -1,0 +1,126 @@
+Step 1=================================================
+I downloaded the .tar.gz of coreutils onto my laptop and scp'd it over to the
+linux server.
+
+After transfering it, I used
+$ ./configure CFLAGS='-g3 -O0'
+to configure the makefile.
+
+I tried to use
+$ make
+
+but ended up getting an error about the files not able to recursively load. So
+we took the patch from cs35L website and made it a .patch file called 
+rename.patch. Then we used
+$ patch -p0 < rename.patch
+
+and then we tried
+$ make
+
+again and it was successful.
+
+
+Step 2=================================================
+I cd'd into the /src directory for ls after finding its location using
+$ find -name ls
+
+Step 3=================================================
+I cp'd the file ls into the /tmp directory because that's where we do our tests.
+$ cp ls /tmp/ls
+
+and we ran the tests:
+$ TZ=UTC0 ./ls -lt --full-time wwi-armistice now now1
+-rw-r--r-- 1 hongshuhong staff 0 1918-11-11 11:00:00.000000000 +0000 
+wwi-armistice 
+-rw-r--r-- 1 hongshuhong staff 0 2016-02-02 19:41:36.163824526 +0000 now1
+-rw-r--r-- 1 hongshuhong staff 0 2016-02-02 19:41:25.138428418 +0000 now 
+
+This is the incorrect one that we wanted to get since it prints wwi-armistice
+first. We want it to print last.
+
+Step 4===============================================
+We are going to try and debug it. 
+
+We will cd back into our /src folder
+
+I first tried to find it from the get_current_time() because that would be
+logically where the error is.
+(gdb) break get_current_time
+
+then we analyzed the locals inside and the globals:
+(gdb) info locals
+(gdb) current_time
+(gdb) current_time_ns
+
+Then we looked through the code and saw the part where we have the
+get_current_time(void) function and we saw that there was an object called
+timespec.
+
+Then we searched for timespec and found timespec_cmp inside of
+cmp_ctime, cmp_mtime, etc.
+Inside of those functions, we saw the timespec_cmp() function was being used to
+compare. We know the sorting must be from comparison, and therefore we looked 
+into where timespec_cmp is in the file and couldn't find anything. Therefore it
+had to be in another file.
+
+After using 
+(gdb) break timespec_cmp
+we found that it was in the file
+../lib/timespec.h, line 48.
+
+We vim'd into the timespec.h file and saw the inline function definition.
+
+Inside, there was a:
+int diff = a.tv_sec - b.tv_sec;
+
+When we ran a
+(gdb) info locals
+we saw:
+timespec = {tv_sec = 1454541092, tv_nsec = 733490179}
+which can easily lead to overflow. We should just make this into a long
+to prevent the overflow from happening.
+
+we imported this inside of timespec.h
+
+#include <limits.h>
+
+and changed this in timespec_cmp
+
+...
+long temp = a.tv_sec - b.tv_sec;
+
+if(temp > INT_MAX){
+    return INT_MAX;
+}
+if(temp < INT_MIN){
+    return INT_MIN;
+}
+...
+
+more info in lab5.diff.
+
+After we do this, we tried ./ls in a tmp directory and got:
+s-169-232-220-200:tmp.JgDUs5hb hongshuhong$ TZ=UTC0 ./ls -lt --full-time 
+wwi-armistice now now1                         
+-rw-r--r-- 1 hongshuhong staff 0 2016-02-04 04:47:24.000000000 +0000 now1
+-rw-r--r-- 1 hongshuhong staff 0 2016-02-04 04:47:19.000000000 +0000 now
+-rw-r--r-- 1 hongshuhong staff 0 1918-11-11 19:00:00.000000000 +0000 
+wwi-armistice
+(some lines are nextlined because of the 80 character limit)
+
+Step 5===============================================
+$ diff -u coreutils-with-bug/lib/timespec.h 
+newCoreutils/coreutils-with-bug/lib/timespec.h > lab5.diff
+
+creates the diff file.
+Step 6===============================================
+Using the previously scp'd coreutils folder, I checked the ls and I found out
+that the linux server's ls is "broken". The dates that are before 1970 are in
+the future. The wwi-armistice example displays as incorrect.
+
+$ TZ=UTC0 ./ls -lt --full-time wwi-armistice now now1
+-rw-r--r-- 1 rayz csugrad 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice 
+-rw-r--r-- 1 rayz csugrad 0 2016-02-02 19:41:36.163824526 +0000 now1
+-rw-r--r-- 1 rayz csugrad 0 2016-02-02 19:41:25.138428418 +0000 now
+
+(as you can see the wwi-armistice is at the front now) 

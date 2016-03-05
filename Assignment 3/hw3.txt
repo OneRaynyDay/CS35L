@@ -1,0 +1,51 @@
+==== Hwk 3 ====
+Q1.Why did Brady's patch remove the line
+"case_long_iso_time_style:"? 
+Was it necessary to remove that line? Explain.
+
+Brady's patch removed the line and replaced it with:
+case long_iso_time_style. The underscore was interefering with 
+the actual flow structure of the switch or if/else 
+statement. Brady simply removed the inside of the for loop
+as a fix and proposed to truncate all dates into 3 characters
+with month spelled in the local language, the case change was
+insignificant since the for loop was never going to call the 
+removed if statement from the first place.
+
+Q2.If your company adopts this patched version of 
+Coreutils instead of the default one, what else 
+should you watch out for? Might this new version 
+of Coreutils introduce other problems with your 
+application, perhaps in countries where users don't 
+speak English and don't understand English-format 
+dates?
+
+Brady's patch simply truncated all the month letters into
+3 characters. What this would do(though not apparent in
+standard english), is misplace the formatting if there was
+another language(thus another locale). In addition, there
+are more people who use computers in non-standard english
+countries than there are in the U.S. and Britain, for e.x.
+Which means that the poor formatting will affect more people.
+
+Q3.What happens when this script is invoked on an empty 
+file like /dev/null, and why?
+
+The script throws an IndexError which is caused by the
+list index being "out of range". If the file is empty, the
+list would have a size of 0. Even accessing array index 0 
+in the list of lines in the file would yield an IndexError.
+In the code itself, there was a comment on the problem:
+"# raises IndexError if seq is empty"
+
+Q4. What happens when this script is invoked with Python 3 
+rather than Python 2, and why? (You can run Python 3 on 
+the SEASnet hosts by using the command python3 instead of 
+python.)
+
+The script throws a SyntaxError because Python3 has a
+different syntax than Python2. The proper syntax should
+now be:
+except IOError as err:
+
+

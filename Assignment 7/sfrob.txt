@@ -1,0 +1,47 @@
+By using the time command for sfrobu and sfrob, I could see a very noticeable difference:
+when I did:
+
+(Note: the testBytes.txt is the same testBytes as in the lab. It's a 5MB rand bytes file)
+
+$ time ./sfrob < ../testBytes.txt > sfrobResult.txt
+
+real    0m0.365s
+user    0m0.276s
+sys     0m0.008s
+
+I got that the system time(the most important part) is very very short. 
+However, when I used sfrobu, the version that required read() instead of getchar()
+
+$ time ./sfrobu < ../testBytes.txt > sfrobResult.txt
+Comparisons: 256715
+real    0m6.038s
+user    0m0.406s
+sys     0m5.565s
+
+This difference is huge, and most of it is due to the system calls taking so long.
+Every single write to the sfrobResult.txt requires one read and one write. In addition,
+the Comparisons made sense. Because there are 19731 lines inside(checked with wc),
+if we use the qsort(quicksort derivation), then the comparisons should be around 
+O(nlogn), which in this case is 20,000*log(20,000) ~= 20,000 * 14 ~= 300,000. That's 
+pretty close to 256715 comparisons!
+
+With the original text file of:
+*~BO *{_CIA *hXE]D *LER #@_GZY #E\OX #^BO #FKPS #NEM
+
+I found the number of comparisons to be 17, which is reasonable. the qsort should be
+a variation of quicksort, which has an amortized avg time complexity of O(nlogn).
+In this case we have 9 words to sort and therefore 9 * log(9) ~= 30. The number of sorts
+is even less than that which means it's within the reasonable boundaries of qsort.
+
+When we did the same comparison with ./sfrobs, the shell script, the answer(with the 5 megabyte file) turned out to be: 
+
+real    0m1.026s
+user    0m0.510s
+sys     0m0.323s
+
+Strangely, this actually took slightly longer in the system times than the sfrob.c. 
+I looked into it and found that the system time is constant throughout all sizes of 
+files(I used a 5MB for this one). When I compared with a 500 bytes sized file, the 
+system time still took 0.295s. This means that my script, which generated the XOR 
+pairs probably took up the system time.
+

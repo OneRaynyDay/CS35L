@@ -1,0 +1,99 @@
+======Step 1======
+First, I made the program tr2b.c and tr2u.c.
+
+In my tr2b.c I used getchar and putchar as methods of system calls.
+In this one I used !feof(stdin) as a method of seeing when the file
+would end, and the putchar() and getchar() functions put my text
+inside of a buffer of an unknown size that was then flushed afterwards.
+
+In my tr2u.c I used read and write as methods of system calls.
+In this one I used the return value of read() as a method of seeing
+when the file would end(it would return a non-positive value).
+
+When I did the strace 
+======Step 2======
+
+Afterwards, I did the command on a file of 5 million bytes(I made a 
+python script called randBytes.py). I recorded the number of system 
+calls by doing the following:
+
+$ strace -c -o results.txt ./tr2u erp flm < testBytes > output.txt
+
+the following command hung for a while on the linux server but
+eventually it finished. 
+
+I see that there are: 9980389 system calls. This is almost 10 million
+system calls which is what we expected from tr2u. tr2u should have about
+roughly a 1 character to 1 system call ratio, and since it has to
+print the same character out to stdout, it would be 2 system calls for
+every input.
+
+If we did:
+
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 57.99    0.719782           0   4980554           write
+ 42.01    0.521356           0   5000002           read
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         2           fstat
+  0.00    0.000000           0         8           mmap
+  0.00    0.000000           0         3           mprotect
+  0.00    0.000000           0         1           munmap
+  0.00    0.000000           0         3           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    1.241138               9980580         1 total
+
+$ strace -c -o results2.txt ./tr2b erp flm < testBytes > output2.txt
+
+we see that the results2.txt is much, much smaller. 
+the size difference is an entire order of magnitude smaller:
+
+This is the output file:
+-rw-r--r--  1 rayz csugrad 5000001 Feb 22 14:52 output2.txt
+
+rayz@lnxsrv01 ~/Week7]$ cat resultb.txt
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+  0.00    0.000000           0        79           read
+  0.00    0.000000           0        77           write
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         4           fstat
+  0.00    0.000000           0        10           mmap
+  0.00    0.000000           0         3           mprotect
+  0.00    0.000000           0         1           munmap
+  0.00    0.000000           0         3           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000000                   184         1 total
+
+This means that there were much less system calls than tr2u.
+
+====== Step 3 =======
+Now, when we time it, we can also see a big difference:
+
+[rayz@lnxsrv02 ~/Week7]$ time ./tr2b erp flm < testBytes > output2.txt
+
+real    0m0.289s
+user    0m0.217s
+sys     0m0.007s
+
+[rayz@lnxsrv02 ~/Week7]$ time ./tr2u erp flm < testBytes > output2.txt
+
+real    0m5.729s
+user    0m0.265s
+sys     0m5.398s
+
+What the "real", "user", and "sys" parts of time means is specific times
+spent in specific regions of the computer. Sys is what we are concerned
+about because that's the time it takes inside of the kernel. 
+
+As we can see, the time it took in the kernel is about ~1000x longer when
+we use read() and write() as opposed to getchar() and putchar(). This
+is the usefulness of having a buffer to reduce the number of system calls.

@@ -1,0 +1,28 @@
+Ray tracing produces a very high degree of visual realism at a high cost
+The algorithm is computationally intensive -> good candidate 
+    for concurrency(embarrassingly parallel)
+
+Basic p_thread functions:
+
+pthread_create: creates new thread
+    -(pthread_t * tid, const pthread_attr_t * attr, void *(my_function)(void*), void *arg);
+        -my_function will be called over and over, with the *arg as argument of my_function. Can pass in NULL for attributes
+            -you need multiple arguments but you'll need to create a STRUCT to pass them in as 1 thing.
+    -return zero for success, can be called any number of times
+pthread_join: waits for another thread to terminate
+    -(pthread_t tid, void **status);
+        -exit status is stored in location of status. can pass in NULL if you don't care.
+pthread_equal: compare thread id to see if they're the same thread
+pthread_self: returns id of calling thread
+pthread_exit: terminates current thread
+
+In this case we only need to care about _create and _join.
+
+For loops are used - refactor the code
+
+pthread_t tids(3); <-- you dont need to pass in your OWN tid's. It creates it for you.
+to get a tid: &tids(1)
+
+if you don't call pthread_join, the MAIN thread might finish before the other pthreads are finished. That way the tasks are not done.
+
+

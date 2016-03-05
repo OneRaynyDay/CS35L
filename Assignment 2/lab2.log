@@ -1,0 +1,203 @@
+Step 1: touch lab2.log
+Created lab2.log
+
+Step 2: emacs lab2.log
+enter emacs to edit lab2
+
+Step 3: locale 
+Unsuccessful because the LC_CTYPE is not "C".
+
+Step 4: export LC_ALL='C' 
+Fixed locale
+
+Step 5: wget
+http://web.cs.ucla.edu/classes/winter16/cs35L/assign/assign2.html
+Downloads webpage as assign2.html
+
+Step 6: cat assign2.html | tr -c 'A-Za-z' '[\n*]' 
+Run the initial command 
+The command takes all the inputs from stdin and retains
+everything that's capital and lowercase alphabets and turns everything
+else into newlines.
+
+Step 7: cat assign2.html | tr -cs 'A-Za-z' '[\n*]' 
+Run the second command 
+The command does the same as Step 5, but if there are
+sequential non-alphabetic letters, there is only 1 new line generated
+for the ongoing sequence.
+
+Step 8: cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort 
+Run the third command 
+The command takes in the same regex expression to
+replace, and the outputs of the regex replacement is
+
+Step 9: cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u 
+Run thefourth command The command takes in the same regex expression and does
+the same thing as Step 8, but there are no duplicate words(u stands
+for unique according to man page)
+
+Step 10: cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm
+- words 
+Run the fifth command 
+The command takes in the same regex expression, sorts the original
+ file and removes duplicates. Then, it compares the sorted list
+ to the text file "words" with no extension. 
+It displays 3 columns, the left column is words exclusive
+to file 1, which is the sorted list, middle column is words exclusive
+to file 2 which is words, and third column is where both files share a
+word.
+
+Step 11: cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm
+-23 - words 
+Run the sixth command 
+The command is the same idea as Step
+10's, but it displays words exclusive to file 1 only. -23 means
+omitting 2nd and 3rd columns.
+
+Step 12: wget http://mauimapp.com/moolelo/hwnwdseng.htm
+mv hwnwdseng.htm hdict.html
+
+Saved hawaiian dictionary as hdict.html
+
+Step 13: Create a bash file called buildwords
+#!/bin/bash  <-- to execute bash commands
+
+(The consequent parts are chained by | pipes)
+
+First part of command: 
+grep '<td>\(..*\)<\/td>'
+finds all lines with <td> tags 
+
+Second part of command: 
+sed 's/.*<td>\(..*\)<\/td>/\1/g'
+removes <td> and </td> 
+
+Third part of command: 
+sed 's/<[^>]*>//g'
+removes all the leftover tags
+
+Fourth part of command: 
+sed '1~2d'
+removes every other line starting @ 1(english lines) 
+
+Fifth part of command:
+sed 's/\ /\n/g'
+removes spaces
+
+sed "s/\`/'/g"
+removes `'s
+
+sed 's/,/\n/g'
+removes ,'s
+
+Sixth part of command:
+tr '[:upper:]' '[:lower:]'
+changes uppercase to lowercase
+
+Seventh part of command:
+grep -v "[^'aeiouhlwnmkp]"
+displays everything that's included in hawaiian letters set
+
+Eighth part of command:
+awk 'NF' 
+display everything that's not an empty line
+
+Ninth part of command:
+sort -u
+sorts the words in order, and removes duplicates
+
+Step 14:
+Put the hawaiian words into the dictionary:
+cat hdict.html | ./buildwords > hdict
+
+Check and compare between the hdict and the assign2.html
+cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm - hdict
+
+Step 15:
+Count the number of "misspelled" English and Hawaiian words
+ on this web page, using your spelling checkers. 
+
+To find differences in english words:
+cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | tr '[:upper:]' '[:lower:]'
+| sort -u | comm -23 - words > ewords.txt
+
+To find differences in hawaiian words:
+cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | tr '[:upper:]' '[:lower:]'
+| sort -u | comm -23 - hwords > hwords.txt
+
+To find similar words:
+comm ewords.txt hwords.txt
+
+comm -13 ewords.txt hwords.txt | wc -w
+see what "english" words were mispelled
+
+The result was:
+38 words that are mispelled in english.
+These were the entries:
+
+basedefs
+buildwords
+charset
+cmp
+ctype
+doctype
+eggert
+eword
+halau
+
+comm -23 ewords.txt hwords.txt | wc -w
+see what "hawaiian" words were mispelled
+
+The result was:
+405 words that are mispelled in hawaiian.
+
+a
+able
+about
+above
+abovementioned
+accent
+address
+after
+afterwards
+against
+all
+also
+an
+and
+any
+apostrophe
+are
+argument
+arguments
+as
+ascii
+assign
+
+Step 16:
+Are there any words that are "misspelled" as English, 
+but not as Hawaiian? or "misspelled" as Hawaiian but not
+as English?
+
+comm -23 ewords.txt hwords.txt | wc -w
+3 words were recorded
+The 3 words were: 
+halau
+lau
+wiki
+
+comm -13 ewords.txt hwords.txt | wc -w
+370 words were recorded
+Some of the words are:
+a
+able
+about
+above
+abovementioned
+accent
+address
+after
+afterwards
+against
+all
+

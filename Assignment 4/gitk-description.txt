@@ -1,0 +1,17 @@
+In the X11 window, I see a couple of panes.
+In one of the top left windows, theres a GUI describing the commits 
+and branches and merges of the previous history. 
+The top middle window displays a list of names and emails associated
+with the actions that they did(commit, merge, etc) on the top left
+window. On the top right window, there is a log of the time at which
+the action was performed by the person. The overall top tab of the
+GUI shows the git log in an intuitive and sorted fashion. Below them,
+there is information of the SHA1 hash for the given commit.
+
+On the bottom, there is a window displaying the change log of each
+commit. Displaying individual logs on the left, and showing the
+file structure on the right side(if pressed Tree). The file structure
+is the current structure of the tree given that time frame of commit.
+
+There are various searching functions like the SHA1 hash, the name of
+commit and specific information of the git tags.

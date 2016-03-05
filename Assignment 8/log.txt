@@ -1,0 +1,63 @@
+To reproduce the results:
+I used the command
+$ od -An -f -N 800000 < /dev/urandom | tr -s ' ' '\n' > random.txt
+to generate 800000 bytes worth of double precision floating point numbers.
+I used /dev/urandom to get the bytes and put it into random.txt after changing
+the spaces into new lines(effectively getting one number per line).
+
+Then, I used time to measure the efficiency of using the command sort 
+created in usr/bin/cs.
+sorted the random.txt and piped the result to /dev/null (result was
+insignificant). I used the option of 2 core parallelism in the options:
+
+$ time -p sort -g --parallel=2 random.txt> /dev/null
+
+the result was:
+
+real 0.98
+user 1.69
+sys 0.00
+
+The result was surprising. The user time is greater than the real time on the clock.
+User time and system time is actually CPU execution time and not real clock time.
+Therefore, in multithreaded processes like ours, we can see that user/sys may at
+times take longer than real clock time.
+
+Then, I tried it with only 1 thread:
+
+$ time -p sort -g --parallel=1 random.txt> /dev/null
+
+and got:
+
+real 1.68
+user 1.67
+sys 0.00
+
+The result made sense. with only 1 thread we could see the real equivalent to user
+since time elapsed is only through 1 core execution.
+
+
+$ time -p sort -g --parallel=4 random.txt > /dev/null
+
+real 0.78
+user 1.45
+sys 0.00
+
+The real time elapsed in this case was less than 0.98, but not by half since now
+we are seeing the multithreading overhead costs come up. In addition, not all
+threads finished sorting at the same time so there's waiting cost as well.
+
+$ time -p sort -g --parallel=8 random.txt > /dev/null
+
+real 1.13
+user 1.83
+sys 0.00
+
+In this case, we used even more "cores"(I only have 4 cores on my macbook) but the
+result is around the same or even worse. 
+This is because having 8 parallel doesn't actually mean 8 times faster. 
+You have to wait for slower threads to finish and some threads share a core 
+which isn't optimal(it does essentially nothing if it's in the same core).
+
+
+
