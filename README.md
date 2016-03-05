@@ -1,5 +1,5 @@
 # CS35L
-CS35L Winter 2016 - Taught by Ruolin Fan as TA for Section 5
+## CS35L Winter 2016 - Taught by Ruolin Fan as TA for Section 5
 
 **Week 1:** _General Linux Introduction - Emacs and shell_
   - GUI vs CLI
@@ -61,3 +61,9 @@ CS35L Winter 2016 - Taught by Ruolin Fan as TA for Section 5
   - attribute((constructor)) and attribute((constructor))
 
 **Week 10:** _Presentations_
+
+More information in:
+  - http://web.cs.ucla.edu/classes/winter16/cs35L/
+  - https://dl.dropboxusercontent.com/u/10527821/cs35l/1.html
+  - https://dl.dropboxusercontent.com/u/3923401/CS35LW16/index.html
+
