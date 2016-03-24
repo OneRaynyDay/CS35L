@@ -1,0 +1,61 @@
+System calls:
+Processor modes:
+    user modes: restricted access to system resources (display, i/o, memory, disc)
+    kernel/supervisor mode: unrestricted access (can do whatever it wants)
+
+User mode:
+    cpu restricted to unprivileged instructions
+    for untrusted user code
+Supervisor mode:
+    cpu unrestricted, can use all instructions
+
+Why?
+    System resources shared among processes
+    OS must ensure:
+        protection - incorrect malicious program cannot cause damage to other processes/system
+        fairness - make sure processes have fair use of devices and cpu
+
+How to achieve protection/fairness
+    I/O protection - prevent illegal I/O writing to disc
+    Memory protection - accessing illegal memory
+    CPU protection - prevent from using CPU for too long
+
+Kernel code is trusted
+    implements protection
+
+What about user processes?
+    Kernel executes privileged operations on BEHALF of user processes (everything goes into kernel)
+
+System calls
+    Functions that changes CPU's mode from user mode to kernel mode
+    Used by user-level process to invoke OS functions
+    Is a part of the kernel of OS
+    Verifies user is allowed to do action then does it (this is the only way you can do privileged operations)
+
+System call vs function call:
+System:
+    controll transfered from user process to OS
+    requires authentication
+Function:
+    caller and callee are in same process
+    same domain of "trust"
+
+System calls
+    Kernel sees if operation is valid then performs it
+
+Library functions
+    functions that are part of standard C library
+    makes system calls on behalf of user(getchar, putchar vs read/write)
+    the only way to make system calls faster is to REDUCE # of system calls
+        batches your calls via a buffer and then executes all of it at once
+    putchar puts a bunch of characters into a buffer THEN writes it
+    getchar gets ALL of the stdin and returns 1 of the letters inside of the loaded buffer
+
+Buffered/Unbuffered I/O
+Unbuffered:
+    every byte is executed (read/written) by kernel through system call
+Buffered:
+    collect as many bytes as possible in a buffer and read more than one single byte at a time and use
+    ... one single call to write all of them
+
+

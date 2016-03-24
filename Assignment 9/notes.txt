@@ -1,0 +1,35 @@
+Static Linking
+----------------
+Code runs in very limited environments
+    -can make binaries easier to distribute to diverse user environments
+    -may allow faster startup times(depends on complexity of program and OS loading strategy)
+Static libraries -> links to program Y at compile-time
+    -links same library to two programs(therefore there's a lot of duplicate code)
+
+Dynamic Linking - links to program Y at run-time
+    -can reduce total resource consumption if more than 1 process share same library
+    -plugins are always dynamic
+    -bug fixes and upgrades to libraries propagate to improve your product
+    -prefix : *.so
+
+Linking vs Loading
+    -dynamic LOADING : mapping(copying) executable or library into a processor's memory after it starts
+
+E.x.:
+static loading & linking
+    -everything resolved at compile time - no extra linking necessary
+dynamic loading static linking
+    -executable has adress/offset table generated at compile time
+    -actual code isn't loaded until process starts
+    -control over memory use while avoiding linking at runtime
+static loading dynamic linking
+    -executable contains reference to dynamic library, but symbol table is missing/incomplete
+        -symbols = variable names
+        -it'll reference these symbols, but it won't actually know what the values are until linked
+    -requires to link during runtime
+dynamic loading, dynamic linking
+    -when you call dlopen
+    -object file loaded dynamically under program control
+    -symbols resolved based on process's unique memory layout at the time
+
+link: dl.dropboxusercontent.com/u/10527821/cs35l/9.html

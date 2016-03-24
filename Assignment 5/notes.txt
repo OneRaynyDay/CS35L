@@ -1,0 +1,74 @@
+------GDB NOTES------
+1. Compile program: just the normal gcc with a "-g" option
+
+2. In gdb interactive shell
+(gdb) run
+
+3. have bugs? Segmentation fault, will receive line:
+program.c:12 <- line 12
+
+4. set break points:
+(gdb) break [file1.c:]6
+(gdb) break my_function
+(gdb) break [position] if expression <-- advanced
+
+
+example: 
+(gdb) s
+27 for (i=1; i<=limit; ++i)
+(gdb) break 28 if i == limit - 1
+
+5. to delete/disable/ignore break points
+(gdb) delete [breakpoint number | range]
+(gdb) disable [...|...]
+(gdb) enable [...|...]
+
+If no arguments, ALL breakpoints are affected.
+
+(gdb) ignore [breakpoint number iterations] <-- breakpoint works after n iterations
+
+6. Resuming execution after a break
+When program stops at breakpoint
+c or continue -> continue until next breakpoint
+n or next -> next line as instruction
+s or step -> next function as instruction
+f or finish -> just ends
+
+7. Displaying data
+(gdb) print [/format] [expression]
+
+formats: d(decimal), x(hex), o(octal), t(binary), c(char)
+
+8. Watchpoints - interrupt at a variable
+(gdb) watch my_var <-- debugger stops when value of my_var changes
+(gdb) rwatch expression <-- search these up
+(gdb) awatch expression <-- ..
+
+-------Process memory layout--------:
+Args and env vars
+Stack (grows downward)
+  |
+  V
+Unused memory
+  ^
+  |
+Heap (grows upwards when C's malloc() or new)
+Uninitialized data segment (bss)
+Initialized Data Segment (variables/initialized global variables)
+Text Segment
+
+
+9. Stack info:
+Everytime a function called, area of memory set aside.
+Area of memory = Stack frame.
+-storage space for automatic variables for new function
+-each function gets its own stack frame. All stacks make up call stack.
+
+10. Analyzing a stack in GDB
+(gdb) backtrace or bt
+-during main: without function calls: 
+#0 main() at program.c:10
+-during display(): 
+#0 display(z=5, zptr=0xbfffffb34) at program.c:15
+#1 0x08048455 in main() at program.c:10
+

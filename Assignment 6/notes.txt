@@ -1,0 +1,29 @@
+SSH = Secure Shell
+
+Encryption types:
+Symmetric Key Encryption:
+    shared/secret key - key used to decrypt same as key used to encrypt
+Asymmetric Key Encryption:
+    2 different public private keys - only creator knows relation. 
+    Private key cannot be derived from public key.
+Problem with symmetric key:
+    You need to agree on a key. It's going to be sent straight through the stream.
+Solved with asymmetric key:
+    You can generate a public key to give to everyone from your private key. They don't know the hashing and
+    the key won't be sent through the stream.
+
+High level ssh protocol:
+$ ssh username@somehost
+If talking to server -> host validation
+"Are you sure you want to continue connecting (yes/no)" - If you connect to it the FIRST TIME. 
+If you connected to 1 ip, and you get this after a while, it means you should be suspicious - might be another comp.
+If it's a malicious server, you could give your password/username away.
+
+Next time client connects:
+    check host's public key against saved public key
+    If they don't match
+    Possible someone is doing nasty - man in the middle attack - you're not actually on the website you think you're on.
+
+Client asks server to prove it is owner using asymmetric encryption. 
+    If server is true owner, can decrypt message with private key.
+

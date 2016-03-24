@@ -1,0 +1,102 @@
+Centralized vs Distributed Version Control System(VCS)
+
+-----------------------------------------------------------
+Centralized:
+-Single central copy of project history on server
+-Changes uploaded to server
+-Other programmers can get changes from server
+-Examples: CVS, SVN
+-Advantage: 
+    Saves space (if you have 100 different copies of the git tree, that takes up alot of space).
+    Easier to make, everyone gets to see the changes at once
+-Cons:
+    Bottleneck with the server
+-----------------------------------------------------------
+Distributed:
+-Each developer gets full history of project
+-Developer can communicate changes without going through central server
+-Examples: Git, Mercurial, Bitbucket
+-Advantage: 
+    Allows for more robust sharing. Person A can share with person B, or with the Centralized server.
+    Commands run fast because tools access hard drive
+    Share changes with few people before showing everyone
+    Commit changes or revert to old version when offline
+-Cons: A lot of disk space to store all versions
+-----------------------------------------------------------
+Why is git a distributed system?
+When you download your project, you get all of your content via git clone.
+-----------------------------------------------------------
+Version Control Terms:
+Repo - data structure that contains files and directories. Contains full history and different versions of project
+Working copy - local copy of files from a repository at a specific time
+Check out - act of creating working copy from repo.
+Commit - act of writing changes made in working copy back to repo
+-----------------------------------------------------------
+Workflows
+Earlier states of working tree checks out from repo using git checkout
+-> Changes to working tree and registered in index using git add
+-> Changes are committed to the repo from state of index using git commit
+-----------------------------------------------------------
+Git architecture
+Blobs - system files, stored in .git/objects, indexed by unique hash
+Trees - like system directories, can include other trees/blobs
+Commits - created with git commit executed, points to recent tree at time of commit, contains name of 
+committer, time of commit, hash of current tree
+Tags - Give names to commits
+head - reference to a commit objects, repo can have multiple heads
+HEAD - current active head
+branch - refers to head and entire history of ancestor commits preceding head
+There could be multiple branches in a git architecture. If there are 2 branches, 
+then each branch = its branch + the root that both the branches share
+
+-----------------------------------------------------------
+Git commands:
+-Getting repo:
+$ git init //creates new repo
+$ git clone //creates copy of existing repo
+-Commits:
+$ git add //adds files to index
+$ git commit //changes added to the repo
+-Getting info:
+$ git help //helps
+$ git status //status of current git tree
+$ git diff //current changes going to be made compared to the previous
+$ git log //shows log of commits
+$ git show 
+How to find man pages for git : man git-add, man git-log, etc
+
+-----------------------------------------------------------
+Making first git repo:
+$ mkdir gitroot
+$ cd gitroot
+$ git init // creates empty git repo, just a .git directory with all subdirectories
+$ echo "Hello World" > hello.txt
+$ git add . // Adds content to index - you have to run this before a commit
+$ git commit -am 'Check in number one' //-a means all -m allows you to 
+//inline your commit message, otherwise it brings you into a vim-like situation
+$ echo "I love git" >> hello.txt
+$ git diff // shows changes we made
+
+Output:
+diff --git a/hello.txt b/hello.txt
+index 557db03..46f04ae 100644
+--- a/hello.txt
++++ b/hello.txt
+@@ -1 +1,2 @@
+ Hello World
++I love git
+
+$ git status // shows list of modified files
+$ git add hello.txt // adds hello.txt to the index again
+$ git diff // should have no difference since diff without parameters compares the INDEX
+$ git diff HEAD // here we see the pre-commit is different from the commit because diff HEAD compares commits
+$ git commit -m "Second commit" // finally commit it
+
+-----------------------------------------------------------
+Undoing stuff
+$ git checkout // check out a specific version/branch of tree
+$ git reset // moves tree back to specified version, --force to ignore working changes
+$ git revert //reverts a commit does not delete the commit object. Reverts can be reverted!
+*Git never eletes a commit object - hard to lose data!
+
+
